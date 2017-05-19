@@ -4,7 +4,6 @@ and include the results in your report.
 """
 import random
 
-
 class SearchTimeout(Exception):
     """Subclass base exception for code clarity. """
     pass
@@ -112,6 +111,7 @@ class IsolationPlayer:
         positive value large enough to allow the function to return before the
         timer expires.
     """
+
     def __init__(self, search_depth=3, score_fn=custom_score, timeout=10.):
         self.search_depth = search_depth
         self.score = score_fn
@@ -209,11 +209,60 @@ class MinimaxPlayer(IsolationPlayer):
                 each helper function or else your agent will timeout during
                 testing.
         """
+
+        """Need to consider where to put the first few moves"""
         if self.time_left() < self.TIMER_THRESHOLD:
             raise SearchTimeout()
 
         # TODO: finish this function!
-        raise NotImplementedError
+        moves = game.Board(game).get_legal_moves()
+        values = []
+
+        for move in moves:
+            possibleMove = game.Board(game).forecast_move(move)
+            values.append(self.min_value(possibleMove, depth - 1))
+
+        maxIndex = moves.index(max(values))
+
+        return moves[maxIndex]
+
+    def max_value(self, game, depth):
+        if self.time_left() < self.TIMER_THRESHOLD:
+            raise SearchTimeout()
+
+        active_player = game.Board(game).active_player
+        value = game.Board(game).utility(active_player)
+
+        if value != 0:
+            return value
+
+        moves = game.Board(game).get_legal_moves(active_player)
+        values = []
+
+        for move in moves:
+            possibleMove = game.Board(game).forecast_move(move)
+            values.append(self.min_value(possibleMove, depth - 1))
+
+        return max(values)
+
+    def min_value(self, game, depth):
+        if self.time_left() < self.TIMER_THRESHOLD:
+            raise SearchTimeout()
+
+        active_player = game.Board(game).active_player
+        value = game.Board(game).utility(active_player)
+
+        if value != 0:
+            return value
+
+        moves = game.Board(game).get_legal_moves(active_player)
+        values = []
+
+        for move in moves:
+            possibleMove = game.Board(game).forecast_move(move)
+            values.append(self.max_value(possibleMove, depth - 1))
+
+        return min(values)
 
 
 class AlphaBetaPlayer(IsolationPlayer):
