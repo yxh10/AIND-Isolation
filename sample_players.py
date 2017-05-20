@@ -195,7 +195,18 @@ class GreedyPlayer():
         legal_moves = game.get_legal_moves()
         if not legal_moves:
             return (-1, -1)
-        _, move = max([(self.score(game.forecast_move(m), self), m) for m in legal_moves])
+
+        # _, move = max([(self.score(game.forecast_move(m), self), m) for m in legal_moves])
+
+        scores = []
+        for move in legal_moves:
+            score = self.score(game.forecast_move(move), self)
+            scores.append((score, move))
+            print('score: %f, move: %s', score, move)
+
+        _, move = max(scores)
+
+        print('------turn ended-------')
         return move
 
 

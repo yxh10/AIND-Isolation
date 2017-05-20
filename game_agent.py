@@ -4,6 +4,7 @@ and include the results in your report.
 """
 import random
 
+
 class SearchTimeout(Exception):
     """Subclass base exception for code clarity. """
     pass
@@ -215,55 +216,83 @@ class MinimaxPlayer(IsolationPlayer):
             raise SearchTimeout()
 
         # TODO: finish this function!
-        moves = game.Board(game).get_legal_moves()
-        values = []
 
-        for move in moves:
-            possibleMove = game.Board(game).forecast_move(move)
-            values.append(self.min_value(possibleMove, depth - 1))
+        player = game.active_player
 
-        maxIndex = moves.index(max(values))
+        moves = game.get_legal_moves()
 
-        return moves[maxIndex]
+        if not moves:
+            return (-1, -1)
+        # values = []
 
-    def max_value(self, game, depth):
+        # for move in moves:
+        #     possible_move = game.forecast_move(move)
+        #     values.append(self.min_value(possible_move, depth - 1, player))
+
+        _, move = max([(self.min_value(game.forecast_move(move), depth - 1, player), move) for move in moves])
+
+        # max_index = moves.index(max(values))
+
+        # return moves[max_index]
+
+        return move
+
+    def max_value(self, game, depth, player):
         if self.time_left() < self.TIMER_THRESHOLD:
             raise SearchTimeout()
 
-        active_player = game.Board(game).active_player
-        value = game.Board(game).utility(active_player)
+        # if self.score(game, self) == float("inf"):
+        #     return float("inf")
 
-        if value != 0:
-            return value
+        if depth == 0:
+            return self.score(game, self)
 
-        moves = game.Board(game).get_legal_moves(active_player)
-        values = []
+        if game.is_loser(player):
+            return float("-inf")
 
-        for move in moves:
-            possibleMove = game.Board(game).forecast_move(move)
-            values.append(self.min_value(possibleMove, depth - 1))
+        if game.is_winner(player):
+            return float("inf")
 
-        return max(values)
+        moves = game.get_legal_moves()
+        # values = []
 
-    def min_value(self, game, depth):
+        # for move in moves:
+        #     possible_move = game.forecast_move(move)
+        #     values.append(self.min_value(possible_move, depth - 1, player))
+
+        max_value = max([self.min_value(game.forecast_move(move), depth - 1, player) for move in moves])
+        # return max(values)
+
+        return max_value
+
+    def min_value(self, game, depth, player):
         if self.time_left() < self.TIMER_THRESHOLD:
             raise SearchTimeout()
 
-        active_player = game.Board(game).active_player
-        value = game.Board(game).utility(active_player)
+        if depth == 0:
+            return self.score(game, self)
 
-        if value != 0:
-            return value
+        if game.is_loser(player):
+            return float("-inf")
 
-        moves = game.Board(game).get_legal_moves(active_player)
-        values = []
+        if game.is_winner(player):
+            return float("inf")
 
-        for move in moves:
-            possibleMove = game.Board(game).forecast_move(move)
-            values.append(self.max_value(possibleMove, depth - 1))
+        # if self.score(game, self) == float("-inf"):
+        #     return float("-inf")
 
-        return min(values)
+        moves = game.get_legal_moves()
 
+
+        # values = []
+        #
+        # for move in moves:
+        #     possible_move = game.forecast_move(move)
+        #     values.append(self.max_value(possible_move, depth - 1, player))
+
+        min_value = min([self.max_value(game.forecast_move(move), depth - 1, player) for move in moves])
+        # return min(values)
+        return min_value
 
 class AlphaBetaPlayer(IsolationPlayer):
     """Game-playing agent that chooses a move using iterative deepening minimax
