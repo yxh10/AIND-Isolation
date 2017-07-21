@@ -305,12 +305,22 @@ class AlphaBetaPlayer(IsolationPlayer):
         """
         self.time_left = time_left
 
+        cut_off = (-1, -1)
         best_move = (-1, -1)
 
         try:
             # The try/except block will automatically catch the exception
             # raised when the timer is about to expire.
-            best_move = self.alphabeta(game, self.search_depth)
+
+
+            depth = 0;
+
+            while True:
+                best_move = self.alphabeta(game, depth)
+                depth += 1
+                if self.time_left() < self.TIMER_THRESHOLD:
+                    return best_move
+
 
         except SearchTimeout:
             pass  # Handle any actions required after timeout as needed
