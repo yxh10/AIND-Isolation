@@ -34,12 +34,16 @@ def custom_score(game, player):
     float
         The heuristic value of the current game state to the specified player.
     """
-    # TODO: finish this function!
-    play_move = game.get_legal_moves(player)
-    opponent = game.get_opponent(player)
-    opponent_move = game.get_legal_moves(opponent)
 
-    return float(len(play_move) - 1.75 * len(opponent_move))
+    player_moves = game.get_legal_moves(player)
+    sum_player_moves = sum([len(game.forecast_move(move).get_legal_moves(player)) for move in player_moves])
+
+    opponent = game.get_opponent(player)
+    opponent_moves = game.get_legal_moves(opponent)
+    sum_opponent_moves = sum([len(game.forecast_move(move).get_legal_moves(opponent)) for move in opponent_moves])
+
+
+    return float(sum_player_moves - sum_opponent_moves)
 
 
 def custom_score_2(game, player):
@@ -64,14 +68,12 @@ def custom_score_2(game, player):
     float
         The heuristic value of the current game state to the specified player.
     """
-    # TODO: finish this function!
 
-    play_move = game.get_legal_moves(player)
-
+    player_moves = game.get_legal_moves(player)
     opponent = game.get_opponent(player)
     opponent_move = game.get_legal_moves(opponent)
 
-    return float(len(play_move) - len(opponent_move))
+    return float(len(player_moves) - 1.75 * len(opponent_move))
 
 
 def custom_score_3(game, player):
@@ -96,13 +98,15 @@ def custom_score_3(game, player):
     float
         The heuristic value of the current game state to the specified player.
     """
-    # TODO: finish this function!
 
-    play_move = game.get_legal_moves(player)
+    player_moves = game.get_legal_moves(player)
+    sum_player_moves = sum([len(game.forecast_move(move).get_legal_moves(player)) for move in player_moves])
+
     opponent = game.get_opponent(player)
-    opponent_move = game.get_legal_moves(opponent)
+    opponent_moves = game.get_legal_moves(opponent)
+    sum_opponent_moves = sum([len(game.forecast_move(move).get_legal_moves(opponent)) for move in opponent_moves])
 
-    return float(len(play_move) - 2 * len(opponent_move))
+    return float(len(player_moves) * sum_player_moves - len(opponent_moves) * sum_opponent_moves)
 
 
 class IsolationPlayer:
@@ -229,8 +233,6 @@ class MinimaxPlayer(IsolationPlayer):
         """Need to consider where to put the first few moves"""
         if self.time_left() < self.TIMER_THRESHOLD:
             raise SearchTimeout()
-
-        # TODO: finish this function!
 
         player = game.active_player
 
